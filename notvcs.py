@@ -3,6 +3,9 @@ import tarfile, os
 import json
 import base64
 import io
+import pcpp
+import time
+from io import StringIO
 
 def unpackArgs() :
 	arguments = {}
@@ -73,6 +76,43 @@ elif __name__ == "__main__" and "mode" in args.keys() and args["mode"] == "repac
 	jsonfiletarinfo.size = len(abuf.getbuffer())
 	tar.addfile(tarinfo=jsonfiletarinfo,fileobj=abuf)
 	
+elif __name__ == "__main__" and "mode" in args.keys() and args["mode"] == "preprocess":
+
+	if not os.path.exists("build/"):
+		try:
+			os.makedirs("build/")
+		except OSError as exc:
+			if exc.errno != errno.EEXIST:
+				raise
+	sys.stdout.flush()
+	old_stdout = sys.stdout
+	sys.stdout = mystdout = StringIO()
+	p = pcpp.cmd.CmdPreprocessor(["pcpp", "unpacked/source/main.cpp", "--line-directive"])
+	sys.stdout = old_stdout
+	pCont = mystdout.getvalue()
+	#print(vars(p))
+	time.sleep(1)
+	#sys.stdout.flush()
+	#int("h" + preprocessedFile.read())
+	#print(pCont)
+	files = {"main.cpp": base64.b64encode(pCont.encode()).decode('utf-8'), "robot-config.h": ""}
+	config = open("unpacked/vexfile_info.json", "r")
+	ufi = config.read()
+	config.close()
+	vfi = {}
+	vfi = json.loads(ufi)
+	#print(type(vfi))
+	vfi["files"] = files
+	fn = vfi["title"]
+	jvfi = json.dumps(vfi)
+	#jvfi = jvfi.replace("'", "\"")
+	abuf = io.BytesIO()
+	abuf.write(jvfi.encode())
+	abuf.seek(0)
+	tar = tarfile.open(fn + ".vex", mode="w:")
+	jsonfiletarinfo = tarfile.TarInfo(name="___ThIsisATemPoRaRyFiLE___.json")
+	jsonfiletarinfo.size = len(abuf.getbuffer())
+	tar.addfile(tarinfo=jsonfiletarinfo,fileobj=abuf)
 elif __name__ == "__main__":
 	print("Please specify parameters. Use the --help option for help.")
 	
