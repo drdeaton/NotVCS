@@ -16,3 +16,9 @@ Your .vex file should be extracted to a folder named `unpacked`, which will cont
 To repack a .vex file, simply have the script in the same directory as your `unpacked` directory. Run the following command:
 
 `python notvcs.py --mode repack`
+
+To repack with preprocessor (if you have multiple files), use:
+
+`python notvcs.py --mode preprocess`
+
+Please note that the preprocessor is pretty sketchy. Don't rely too much on it.
