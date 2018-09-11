@@ -6,6 +6,15 @@ import io
 import pcpp
 import time
 from io import StringIO
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-p", "--preprocess", help="Pack with preprocessor", action="store_true")
+parser.add_argument("-r", "--repack", help="Pack without preprocessor", action="store_true")
+parser.add_argument("-u", "--unpack", help="Unpack (requires file parameter)", action="store_true")
+parser.add_argument("--file", help="Specify file name for unpacking")
+args = parser.parse_args()
+#print(type(args))
 
 def unpackArgs() :
 	arguments = {}
@@ -20,27 +29,30 @@ def unpackArgs() :
 			tracker = ""
 	return arguments 
 
-if __name__ == "__main__":
-	args = unpackArgs()
+# if __name__ == "__main__":
+	# args = unpackArgs()
 	
-if __name__ == "__main__" and ("help" in args.keys()):
-	print("NotVCS.py Help Menu\n\nOptions:\n--help me - Shows help menu\n--mode <unpack/repack> - Specify whether to unpack or repack a .vex file\n--file <file name> - Specify the name of your file")
+#if __name__ == "__main__" and ():
+#	print("NotVCS.py Help Menu\n\nOptions:\n--help me - Shows help menu\n--mode <unpack/repack> - Specify whether to unpack or repack a .vex file\n--file <file name> - Specify the name of your file")
 	
-elif __name__ == "__main__" and "mode" in args.keys() and args["mode"] == "unpack":
-
+if __name__ == "__main__" and args.unpack:
+	try:
+		assert args.file != None
+	except:
+		raise Exception("You must specify a file!")
 	if not os.path.exists("unpacked/source/"):
 		try:
 			os.makedirs("unpacked/source/")
 		except OSError as exc:
 			if exc.errno != errno.EEXIST:
 				raise
-	vexFile = args["file"]
+	vexFile = args.file
 	print("Reading from file %s" % vexFile)
 	tar = tarfile.open(vexFile, mode="r:*")
 	for containedFile in tar.getmembers():
 		cFile = tar.extractfile(containedFile)
 		dataJson = cFile.read()
-	print(dataJson.decode())
+	#print(dataJson.decode())
 	dataExtracted = json.loads(dataJson)
 	
 	files = dataExtracted.pop('files', None)
@@ -55,7 +67,7 @@ elif __name__ == "__main__" and "mode" in args.keys() and args["mode"] == "unpac
 			notb64 = base64.b64decode(files[fileName])
 			el_file.write(notb64.decode('utf-8'))
 
-elif __name__ == "__main__" and "mode" in args.keys() and args["mode"] == "repack":
+elif __name__ == "__main__" and args.repack:
 	with open('unpacked/vexfile_info.json', 'r') as csv_file:
 		vfi = json.loads(csv_file.read())
 	files = {}
@@ -76,7 +88,7 @@ elif __name__ == "__main__" and "mode" in args.keys() and args["mode"] == "repac
 	jsonfiletarinfo.size = len(abuf.getbuffer())
 	tar.addfile(tarinfo=jsonfiletarinfo,fileobj=abuf)
 	
-elif __name__ == "__main__" and "mode" in args.keys() and args["mode"] == "preprocess":
+elif __name__ == "__main__" and args.preprocess:
 
 	if not os.path.exists("build/"):
 		try:
