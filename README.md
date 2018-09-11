@@ -3,7 +3,7 @@
 Not VCS is a python script that allows you to unpack and repack .vex files. 
 
 # Requirements
-Not VCS requires Python 3
+Not VCS requires Python 3 and [PCPP](https://github.com/ned14/pcpp/)
 # Unpacking
 To unpack a .vex file, move the script into the directory with your .vex file.
 Open a command prompt, powershell window, or terminal, and type the following command:
