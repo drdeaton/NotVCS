@@ -87,7 +87,7 @@ elif __name__ == "__main__" and "mode" in args.keys() and args["mode"] == "prepr
 	sys.stdout.flush()
 	old_stdout = sys.stdout
 	sys.stdout = mystdout = StringIO()
-	p = pcpp.cmd.CmdPreprocessor(["pcpp", "unpacked/source/main.cpp", "--line-directive"])
+	p = pcpp.cmd.CmdPreprocessor(["pcpp", "unpacked/source/main.cpp", "--line-directive", "--passthru-unfound-includes"])
 	sys.stdout = old_stdout
 	pCont = mystdout.getvalue()
 	#print(vars(p))
