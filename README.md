@@ -21,8 +21,11 @@ To repack with preprocessor (if you have multiple files), use:
 
 `python notvcs.py -p`
 If you want to automatically open the file in VCS after preprocessing, use the `-o` option:
+
 `python notvcs.py -p -o`
+
 Or:
+
 `python notvcs.py -po`
 
 Please note that the preprocessor is pretty sketchy. Don't rely too much on it.
