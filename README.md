@@ -20,6 +20,7 @@ To repack a .vex file, simply have the script in the same directory as your `unp
 To repack with preprocessor (if you have multiple files), use:
 
 `python notvcs.py -p`
+
 If you want to automatically open the file in VCS after preprocessing, use the `-o` option:
 
 `python notvcs.py -p -o`
