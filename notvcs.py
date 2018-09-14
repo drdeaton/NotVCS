@@ -7,12 +7,14 @@ import pcpp
 import time
 from io import StringIO
 import argparse
+import subprocess
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-p", "--preprocess", help="Pack with preprocessor", action="store_true")
 parser.add_argument("-r", "--repack", help="Pack without preprocessor", action="store_true")
 parser.add_argument("-u", "--unpack", help="Unpack (requires file parameter)", action="store_true")
 parser.add_argument("--file", help="Specify file name for unpacking")
+parser.add_argument("-o", "--open", help="Opens file in VCS after it is processed. VCS must be installed.", action="store_true")
 args = parser.parse_args()
 #print(type(args))
 
@@ -103,11 +105,14 @@ elif __name__ == "__main__" and args.preprocess:
 	sys.stdout = old_stdout
 	pCont = mystdout.getvalue()
 	#print(vars(p))
+	pCont.replace('\n'*2, '\n')
+	topMessage = "/***********************************************************************************\nThis code was generated from multiple source files using NotVCS, by AusTIN CANs 2158\n https://github.com/dysproh/notvcs \n***********************************************************************************/\n"
+	uCont = topMessage + pCont
 	time.sleep(1)
 	#sys.stdout.flush()
 	#int("h" + preprocessedFile.read())
 	#print(pCont)
-	files = {"main.cpp": base64.b64encode(pCont.encode()).decode('utf-8'), "robot-config.h": ""}
+	files = {"main.cpp": base64.b64encode(uCont.encode()).decode('utf-8'), "robot-config.h": ""}
 	config = open("unpacked/vexfile_info.json", "r")
 	ufi = config.read()
 	config.close()
@@ -116,6 +121,7 @@ elif __name__ == "__main__" and args.preprocess:
 	#print(type(vfi))
 	vfi["files"] = files
 	fn = vfi["title"]
+	fn = fn.replace(" ", "-")
 	jvfi = json.dumps(vfi)
 	#jvfi = jvfi.replace("'", "\"")
 	abuf = io.BytesIO()
@@ -125,6 +131,17 @@ elif __name__ == "__main__" and args.preprocess:
 	jsonfiletarinfo = tarfile.TarInfo(name="___ThIsisATemPoRaRyFiLE___.json")
 	jsonfiletarinfo.size = len(abuf.getbuffer())
 	tar.addfile(tarinfo=jsonfiletarinfo,fileobj=abuf)
+	tar.close()
+	if args.open:
+		try:
+			retcode = subprocess.call("start " + fn + ".vex", shell=True)
+			if retcode < 0:
+				print("Child was terminated by signal")
+			else:
+				pass
+				#print("Child returned something idk")
+		except:
+			raise
 elif __name__ == "__main__":
 	print("Please specify parameters. Use the --help option for help.")
 	
