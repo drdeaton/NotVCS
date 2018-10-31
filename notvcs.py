@@ -5,6 +5,7 @@ import base64
 import io
 import pcpp
 import time
+import platform
 from io import StringIO
 import argparse
 import subprocess
@@ -188,7 +189,17 @@ elif __name__ == "__main__" and args.preprocess:
 	tar.close()
 	if args.open:
 		try:
-			retcode = subprocess.call("start " + fn + ".vex", shell=True)
+			if platform.system() == "Windows":
+				retcode = subprocess.call("start " + fn + ".vex", shell=True)
+			elif platform.system() = "Darwin":
+				retcode = subprocess.call("open " + fn + ".vex", shell=True)
+			elif platform.system() = "Linux":
+				print("Linux systems are not supported by Vex Coding Studio")
+				exit()
+			else:
+				print("Unknown OS: '%s'" % platform.system())
+				exit()
+				
 			if retcode < 0:
 				print("Child was terminated by signal")
 			else:
