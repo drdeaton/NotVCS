@@ -15,6 +15,7 @@ parser.add_argument("-r", "--repack", help="Pack without preprocessor", action="
 parser.add_argument("-u", "--unpack", help="Unpack (requires file parameter)", action="store_true")
 parser.add_argument("--file", help="Specify file name for unpacking")
 parser.add_argument("-o", "--open", help="Opens file in VCS after it is processed. VCS must be installed.", action="store_true")
+parser.add_argument("-t", "--template", help="Generate template files for editing and use with NotVCS", action="store_true")
 args = parser.parse_args()
 #print(type(args))
 
@@ -37,7 +38,61 @@ def unpackArgs() :
 #if __name__ == "__main__" and ():
 #	print("NotVCS.py Help Menu\n\nOptions:\n--help me - Shows help menu\n--mode <unpack/repack> - Specify whether to unpack or repack a .vex file\n--file <file name> - Specify the name of your file")
 	
-if __name__ == "__main__" and args.unpack:
+if __name__ == "__main__" and args.template:
+	print("Generating template files...")
+	if not os.path.exists("unpacked/source/"):
+		try:
+			os.makedirs("unpacked/source/")
+		except OSError as exc:
+			if exc.errno != errno.EEXIST:
+				raise
+	
+	if not os.path.exists("unpacked/source/main.cpp"):
+		with open("unpacked/source/main.cpp", "w") as main:
+			main.write("""
+#include "robot-config.h"
+
+//This allows using competition things, like autonomous and usercontrol
+vex::competition    Competition;
+
+void pre_auton( void ) {
+  // Things you need do before autonomous
+}
+
+void autonomous( void ) {
+  //15-second (45 second for VEX U) autonomous code
+}
+
+void usercontrol( void ) {
+  // User control code here, inside the loop
+  while (1) {
+    
+  }
+}
+
+int main() {
+    
+    //Run the pre-autonomous function
+    pre_auton();
+    
+    //Set up callbacks for autonomous and driver control periods
+    Competition.autonomous( autonomous );
+    Competition.drivercontrol( usercontrol );
+
+    //Prevent main from exiting with an infinite loop. Don't judge me, this template is taken directly from VCS.                       
+    while(1) {
+      vex::task::sleep(100)
+    }    
+       
+}
+			""")
+		with open("unpacked/vexfile_info.json", "w") as vfinfo:
+			vfinfo.write("""
+{"title": "NotVCS Program", "description": "A short description of your project", "version": "0.0.1", "icon": "USER000x.bmp", "competition": false, "device": {"slot": 1, "type": "vexV5"}, "language": {"name": "c++"}, "components": []}
+			""")
+		with open("unpacked/source/robot-config.h","w") as rcfg:
+			rcfg.write("vex::brain Brain;")
+elif __name__ == "__main__" and args.unpack:
 	try:
 		assert args.file != None
 	except:
@@ -108,7 +163,6 @@ elif __name__ == "__main__" and args.preprocess:
 	pCont.replace('\n'*2, '\n')
 	topMessage = "/***********************************************************************************\nThis code was generated from multiple source files using NotVCS, by AusTIN CANs 2158\n https://github.com/dysproh/notvcs \n***********************************************************************************/\n"
 	uCont = topMessage + pCont
-	time.sleep(1)
 	#sys.stdout.flush()
 	#int("h" + preprocessedFile.read())
 	#print(pCont)
