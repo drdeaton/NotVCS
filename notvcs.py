@@ -191,9 +191,9 @@ elif __name__ == "__main__" and args.preprocess:
 		try:
 			if platform.system() == "Windows":
 				retcode = subprocess.call("start " + fn + ".vex", shell=True)
-			elif platform.system() = "Darwin":
+			elif platform.system() == "Darwin":
 				retcode = subprocess.call("open " + fn + ".vex", shell=True)
-			elif platform.system() = "Linux":
+			elif platform.system() == "Linux":
 				print("Linux systems are not supported by Vex Coding Studio")
 				exit()
 			else:
