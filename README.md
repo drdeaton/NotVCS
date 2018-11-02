@@ -1,32 +1,35 @@
-# Not VCS
+# VCS4CMD
 
-Not VCS is a python script that allows you to unpack and repack .vex files. 
+VCS4CMD, formerly known as NotVCS, is a program aimed at making VCS better. VCS4CMD in currently in beta, so, as of the time of writing, it requires both Vex Coding Studio and ProsV5 to be installed.
 
-# Requirements
-Not VCS requires Python 3 and [PCPP](https://github.com/ned14/pcpp/)
-# Unpacking
-To unpack a .vex file, move the script into the directory with your .vex file.
-Open a command prompt, powershell window, or terminal, and type the following command:
+# Why VCS4CMD?
 
-`python notvcs.py -u --file <.vex file name>`
+VCS4CMD has a few key advantages that complement other programs. It is similar to PROS in that it allows true multi-file support, but, unlike PROS, it uses the official API as developed by Robomatter, Inc.
 
-Your .vex file should be extracted to a folder named `unpacked`, which will contain a json file and a source directory, which will in turn have all of your source files.
+# Dependencies
 
-# Repacking
-To repack a .vex file, simply have the script in the same directory as your `unpacked` directory. Run the following command:
+VCS4CMD requires the following:
 
-`python notvcs.py -r`
+[PCPP](https://pypi.org/project/pcpp/)
 
-To repack with preprocessor (if you have multiple files), use:
+[Vex Coding Studio](https://vexrobotics.org)
 
-`python notvcs.py -p`
+Optional (needed for command line upload):
 
-If you want to automatically open the file in VCS after preprocessing, use the `-o` option:
+[PROS](https://pros.cs.purdue.edu)
 
-`python notvcs.py -p -o`
+[GnuWin32 Make](http://gnuwin32.sourceforge.net/packages/make.htm)
 
-Or:
+# Usage
 
-`python notvcs.py -po`
+VCS4CMD has a few command line options. As of now, unless you have PROS installed alongside VCS, it is recommended that you use this for loading programs onto your robot:
 
-Please note that the preprocessor is pretty sketchy. Don't rely too much on it.
+`python notvcs.py -po` or `python VCS4CMD.py -po`
+
+If ProsV5 and GnuWin32 Make are installed, you can use this command instead:
+
+`python VCS4CMD.py -l`
+
+Please note that notvcs.py is discontinued and that updates will only be made to VCS4CMD.py.
+
+Upload (-l) still requires testing. Use at your own risk.
