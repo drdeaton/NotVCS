@@ -180,6 +180,7 @@ elif __name__ == "__main__" and args.upload:
 	abuf = open(os.path.expanduser('~') + "/AppData/local/VEX Coding Studio/VEX Coding Studio/sdk/user/main.cpp", "w")
 	abuf.write(uCont)
 	os.chdir (os.path.expanduser('~').replace("\\", "/") + '/AppData/local/VEX Coding Studio/VEX Coding Studio/sdk/user/')
+	os.system('C:\\"Program Files (x86)"\\GnuWin32\\bin\\make.exe -f makefile-cmd clean')
 	os.system('C:\\"Program Files (x86)"\\GnuWin32\\bin\\make.exe -f makefile-cmd cxx_bin')
 	os.system('prosv5 upload cxx.bin')
 
