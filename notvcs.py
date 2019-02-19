@@ -5,7 +5,6 @@ import base64
 import io
 import pcpp
 import time
-import platform
 from io import StringIO
 import argparse
 import subprocess
@@ -17,7 +16,6 @@ parser.add_argument("-u", "--unpack", help="Unpack (requires file parameter)", a
 parser.add_argument("--file", help="Specify file name for unpacking")
 parser.add_argument("-o", "--open", help="Opens file in VCS after it is processed. VCS must be installed.", action="store_true")
 parser.add_argument("-t", "--template", help="Generate template files for editing and use with NotVCS", action="store_true")
-parser.add_argument("-l", "--upload", help="Automatically compile and upload program to robot. Requires Vex Coding Studio, PROSv5, and GnuWin32 make to be used.", action="store_true")
 args = parser.parse_args()
 #print(type(args))
 
@@ -146,44 +144,7 @@ elif __name__ == "__main__" and args.repack:
 	jsonfiletarinfo = tarfile.TarInfo(name="___ThIsisATemPoRaRyFiLE___.json")
 	jsonfiletarinfo.size = len(abuf.getbuffer())
 	tar.addfile(tarinfo=jsonfiletarinfo,fileobj=abuf)
-
-elif __name__ == "__main__" and args.upload:
-
-	if not os.path.exists("build/"):
-		try:
-			os.makedirs("build/")
-		except OSError as exc:
-			if exc.errno != errno.EEXIST:
-				raise
-				
-	if not os.path.exists(os.path.expanduser('~') + "/AppData/local/VEX Coding Studio/VEX Coding Studio/sdk/user/"):
-		raise Exception("Vex Coding Studio must be installed")
-	if not os.path.exists(os.path.expanduser('~') + "\\AppData\\Local\\Programs\\Python\\Python36-32\\Scripts\\prosv5.exe"):
-		raise Exception("With this version, PROS 3 must be installed. This may be changed in a future release")
-	if not os.path.exists("C:\\Program Files (x86)\\GnuWin32\\bin\\make.exe"):
-		raise Exception("GNUWin32 make must be installed")
 	
-	sys.stdout.flush()
-	old_stdout = sys.stdout
-	sys.stdout = mystdout = StringIO()
-	p = pcpp.cmd.CmdPreprocessor(["pcpp", "unpacked/source/main.cpp", "--line-directive", "--passthru-unfound-includes"])
-	sys.stdout = old_stdout
-	pCont = mystdout.getvalue()
-	#print(vars(p))
-	pCont.replace('\n'*2, '\n')
-	topMessage = "/***********************************************************************************\nThis code was generated from multiple source files using NotVCS, by AusTIN CANs 2158\n https://github.com/dysproh/notvcs \n***********************************************************************************/\n"
-	uCont = topMessage + pCont
-	#sys.stdout.flush()
-	#int("h" + preprocessedFile.read())
-	#print(pCont)
-	#jvfi = jvfi.replace("'", "\"")
-	abuf = open(os.path.expanduser('~') + "/AppData/local/VEX Coding Studio/VEX Coding Studio/sdk/user/main.cpp", "w")
-	abuf.write(uCont)
-	os.system('C:\\"Program Files (x86)"\\GnuWin32\\bin\\make.exe -f '+os.path.expanduser('~')+'\\AppData\\local/"VEX Coding Studio"/"VEX Coding Studio"/sdk\\user\\makefile-cmd cxx_bin')
-
-	
-
-
 elif __name__ == "__main__" and args.preprocess:
 
 	if not os.path.exists("build/"):
@@ -195,13 +156,23 @@ elif __name__ == "__main__" and args.preprocess:
 	sys.stdout.flush()
 	old_stdout = sys.stdout
 	sys.stdout = mystdout = StringIO()
-	p = pcpp.cmd.CmdPreprocessor(["pcpp", "unpacked/source/main.cpp", "--line-directive", "--passthru-unfound-includes"])
+	
+	#Default to main.cpp
+	if os.path.exists("unpacked/source/main.cpp"):
+		p = pcpp.cmd.CmdPreprocessor(["pcpp", "unpacked/source/main.cpp", "--line-directive", "--passthru-unfound-includes"])
+		
+	#Otherwise, use main.cc
+	elif os.path.exists("unpacked/source/main.cc"):
+		p = pcpp.cmd.CmdPreprocessor(["pcpp", "unpacked/source/main.cc", "--line-directive", "--passthru-unfound-includes"])
+		
+	
 	sys.stdout = old_stdout
 	pCont = mystdout.getvalue()
 	#print(vars(p))
 	pCont.replace('\n'*2, '\n')
 	topMessage = "/***********************************************************************************\nThis code was generated from multiple source files using NotVCS, by AusTIN CANs 2158\n https://github.com/dysproh/notvcs \n***********************************************************************************/\n"
 	uCont = topMessage + pCont
+	time.sleep(1)
 	#sys.stdout.flush()
 	#int("h" + preprocessedFile.read())
 	#print(pCont)
@@ -227,17 +198,7 @@ elif __name__ == "__main__" and args.preprocess:
 	tar.close()
 	if args.open:
 		try:
-			if platform.system() == "Windows":
-				retcode = subprocess.call("start " + fn + ".vex", shell=True)
-			elif platform.system() == "Darwin":
-				retcode = subprocess.call("open " + fn + ".vex", shell=True)
-			elif platform.system() == "Linux":
-				print("Linux systems are not supported by Vex Coding Studio")
-				exit()
-			else:
-				print("Unknown OS: '%s'" % platform.system())
-				exit()
-				
+			retcode = subprocess.call("start " + fn + ".vex", shell=True)
 			if retcode < 0:
 				print("Child was terminated by signal")
 			else:
@@ -245,8 +206,6 @@ elif __name__ == "__main__" and args.preprocess:
 				#print("Child returned something idk")
 		except:
 			raise
-			
-
 elif __name__ == "__main__":
 	print("Please specify parameters. Use the --help option for help.")
 	
