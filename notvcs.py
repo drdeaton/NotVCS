@@ -8,6 +8,7 @@ import time
 from io import StringIO
 import argparse
 import subprocess
+import re
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-p", "--preprocess", help="Pack with preprocessor", action="store_true")
@@ -170,6 +171,50 @@ elif __name__ == "__main__" and args.preprocess:
 	pCont = mystdout.getvalue()
 	#print(vars(p))
 	pCont.replace('\n'*2, '\n')
+	pCont = re.sub(r'#include\s+[<"]NV_(\w+)[>"]', r'//!EXTENSION \1', pCont)
+	
+	importedExtensions = []
+	while(True):
+		imports = 0
+		pLines = pCont.splitlines()
+		oLines = []
+		for line in pLines:
+			if not line.startswith("//!EXTENSION"):
+				oLines.append(line)
+				continue	
+			
+			
+			imports += 1
+			extName = line[13:]
+			
+			if extName in importedExtensions:
+				print("Skipping extension %s: Already imported" % extName)
+				continue
+			importedExtensions.append(extName)
+			
+			
+			print("Importing NVCS Extension %s" % extName)
+			if os.path.exists(os.getenv('APPDATA') + '/notvcs/extensions/' + extName + '/extension.nvcx'):
+				pass
+			else:
+				raise Exception("No extension by the name of %s has been found on this computer" % extName)
+				
+			extFile = open(os.getenv('APPDATA') + '/notvcs/extensions/' + extName + '/extension.nvcx', 'r')
+			extJson = extFile.read()
+			extFile.close()
+			extData = json.loads(extJson)
+			
+			extCodeEncoded = extData["content"]
+			extCodeDecoded = base64.b64decode(extCodeEncoded.encode()).decode('utf-8')
+			
+			oLines.extend(extCodeDecoded.splitlines())
+		
+		
+		pCont = "\n".join(oLines)
+		pCont = re.sub(r'#include\s+[<"]NV_(\w+)[>"]', r'//!EXTENSION \1', pCont)
+		if imports == 0:
+			break
+	
 	topMessage = "/***********************************************************************************\nThis code was generated from multiple source files using NotVCS, by AusTIN CANs 2158\n https://github.com/dysproh/notvcs \n***********************************************************************************/\n"
 	uCont = topMessage + pCont
 	time.sleep(1)
