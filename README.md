@@ -1,3 +1,6 @@
+# WITH THE RELEASE OF VEXCODE, THIS PROJECT IS OFFICIALLY DEAD
+# VEXCODE IS FAR SUPERIOR TO VCS+NOTVCS, USE THAT INSTEAD
+
 # VCS4CMD
 
 VCS4CMD, formerly known as NotVCS, is a program aimed at making VCS better. VCS4CMD in currently in beta, so, as of the time of writing, it requires both Vex Coding Studio and ProsV5 to be installed.
